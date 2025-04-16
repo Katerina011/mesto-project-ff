@@ -28,3 +28,8 @@ initialCards.forEach((item) => {
     const card = createCard(item, onDelete);
     cardList.append(card);
 });
+
+initialCards.forEach((item) => {
+    const card = createCard(item, onDelete);
+    cardList.append(card);
+});
