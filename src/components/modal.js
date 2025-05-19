@@ -1,6 +1,6 @@
 const escKeyHandler = ((evt) => {
-    const popup = document.querySelector('.popup_is-opened');
     if(evt.key === 'Escape') {
+        const popup = document.querySelector('.popup_is-opened');
         closeModal(popup);
     }
 });
