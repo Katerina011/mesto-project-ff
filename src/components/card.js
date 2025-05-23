@@ -1,6 +1,5 @@
 // @todo: Функция создания карточки
-import {openPopupImg} from "../index";
-export function createCard(item, onDelete, putLike,) {
+export function createCard(item, onDelete, putLike, openPopupImg) {
     const cardTmp = document.querySelector('#card-template').content;
     const card = cardTmp.querySelector('.card').cloneNode(true);
     const btnDelete = card.querySelector('.card__delete-button');

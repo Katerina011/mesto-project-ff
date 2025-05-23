@@ -10,6 +10,8 @@ const btnAddCard = document.querySelector('.profile__add-button');
 const popupEditProfile = document.querySelector('.popup_type_edit');
 const popupAddCard = document.querySelector('.popup_type_new-card');
 const popupCardImg = document.querySelector('.popup_type_image');
+const popupImage = popupCardImg.querySelector('.popup__image');
+const popupCaption = popupCardImg.querySelector('.popup__caption');
 const profileForm = document.forms['edit-profile'];
 const nameInput = profileForm.elements.name;
 const jobInput = profileForm.elements.description;
@@ -18,22 +20,20 @@ const profileDescription = document.querySelector('.profile__description');
 const addPlaceForm = document.forms['new-place'];
 const placeNameInput =addPlaceForm.elements['place-name'];
 const linkInput = addPlaceForm.elements.link;
-
-// @todo: Вывести карточки на страницу
-initialCards.forEach((item) => {
-    const card = createCard(item, onDelete, putLike);
-    cardList.append(card);
-});
-
-// @todo: попапы
-export const openPopupImg = (name, link) => {
-    const popupImage = popupCardImg.querySelector('.popup__image');
-    const popupCaption = popupCardImg.querySelector('.popup__caption');
+const openPopupImg = (name, link) => {
     popupImage.src = link;
     popupImage.alt = name;
     popupCaption.textContent = name;
     openModal(popupCardImg);
 };
+
+// @todo: Вывести карточки на страницу
+initialCards.forEach((item) => {
+    const card = createCard(item, onDelete, putLike, openPopupImg);
+    cardList.append(card);
+});
+
+// @todo: попапы
 btnEditProfile.addEventListener('click', () => {
     openModal(popupEditProfile)
     nameInput.value = profileTitle.textContent;
@@ -60,7 +60,7 @@ const handleAddFormSubmit = (evt) => {
         name: placeNameInput.value,
         link: linkInput.value,
     };
-    cardList.prepend(createCard(newCard, onDelete, putLike));
+    cardList.prepend(createCard(newCard, onDelete, putLike, openPopupImg));
     closeModal(popupAddCard);
     addPlaceForm.reset();
 }
