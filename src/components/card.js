@@ -1,19 +1,34 @@
+import {putCardLike, deleteCardLike, deleteCard} from "./api";
+
 // @todo: Функция создания карточки
-export function createCard(item, onDelete, putLike, openPopupImg) {
+export function createCard(cards, onDelete, openPopupImg, putLike, userId) {
     const cardTmp = document.querySelector('#card-template').content;
     const card = cardTmp.querySelector('.card').cloneNode(true);
     const btnDelete = card.querySelector('.card__delete-button');
     const btnLike = card.querySelector('.card__like-button');
+    const likesCounter = card.querySelector('.card__like-counter');
     const cardImage = card.querySelector('.card__image');
-    cardImage.src = item.link;
-    cardImage.alt = item.name;
-    card.querySelector('.card__title').textContent = item.name;
-    
-    cardImage.addEventListener('click', () => openPopupImg(item.name, item.link));
+    card.querySelector('.card__title').textContent = cards.name;
+    cardImage.src = cards.link;
+    cardImage.alt = cards.name;
+    likesCounter.textContent = cards.likes.length;
+   
+    cardImage.addEventListener('click', () => openPopupImg(cards.name, cards.link));
 
-    btnDelete.addEventListener('click', () => onDelete(card));
+    if (userId !== cards.owner._id) {
+        btnDelete.style.display = "none";
+    } else {
+        btnDelete.addEventListener('click', () => {
+            const cardId = cards._id;
+            onDelete(card, cardId);
+        })
+    };
 
-    btnLike.addEventListener('click', putLike);
+     const isLiked = cards.likes.some((like) => like._id === userId);
+        if (userId === cards._id) {
+            btnLike.classList.add("card_button-like_active")
+        }
+
     return card;
 };
 
@@ -23,6 +38,25 @@ export function onDelete(card) {
 };
 
 // @todo: Функция лайка
-export const putLike = (evt) => {
-    evt.target.classList.toggle('card__like-button_is-active');
-};
+export function putLike(likesCounter, btnLike, cards) {
+  if (btnLike.classList.contains("card__like-button_is-active")) {
+    deleteCardLike(cards._id)
+    .then((res) => {
+      btnLike.classList.toggle("card__like-button_is-active");
+      likesCounter.textContent = res.likes.length;
+    })
+    .catch((err) => {
+      console.error("Ошибка:", err);
+    });
+  } else {
+    
+    putCardLike(cards._id)
+    .then((res) => {
+      btnLike.classList.toggle("card__like-button_is-active");
+      likesCounter.textContent = res.likes.length;
+    })
+    .catch((err) => {
+      console.error("Ошибка :", err);
+    });
+  }
+}
