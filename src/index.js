@@ -21,12 +21,20 @@ const nameInput = profileForm.elements.name;
 const jobInput = profileForm.elements.description;
 const profileTitle = document.querySelector('.profile__title');
 const profileDescription = document.querySelector('.profile__description');
-const avatarForm = document.forms['.new-avatar'];
+const avatarForm = document.forms['new-avatar'];
+const avatarUrlUnput = avatarForm.elements.url;
 const avatarImage = document.querySelector(".profile__image");
 const addPlaceForm = document.forms['new-place'];
 const placeNameInput =addPlaceForm.elements['place-name'];
 const linkInput = addPlaceForm.elements.link;
 
+const loading = (isLoading, button, buttonText = "Сохранить", loadingText = "Сохранение...") => {
+  if (isLoading) {
+    button.textContent = loadingText;
+  } else {
+    button.textContent = buttonText;
+  }
+};
 const openPopupImg = (name, link) => {
     popupImage.src = link;
     popupImage.alt = name;
@@ -58,6 +66,15 @@ function addUserInfo(user) {
     avatarImage.style.backgroundImage = `url(${user.avatar})`;
     userId = user._id;
 }
+
+Promise.all([getUserInfo(), getInitialCards()])
+  .then(([user, cards]) => {
+    addUserInfo(user);
+    renderInitialCards(cards, onDelete, putLike, openPopupImg, user._id);
+  })
+  .catch((err) => {
+    console.error("Произошла ошибка при получении данных:", err);
+  });
 
 // @todo: попапы
 btnEditProfile.addEventListener('click', () => {
@@ -99,17 +116,40 @@ const handleAddFormSubmit = (evt) => {
     addPlaceForm.reset();
 };
 
+function handleSubmit(request, evt, loadingText = "Сохранение...") {
+  evt.preventDefault();
+    const submitButton = evt.submitter;
+    const buttonText = submitButton.textContent;
+    loading(true, submitButton, buttonText, loadingText);
+
+    request()
+    .then(() => {
+      evt.target.reset();
+    })
+    .catch((err) => {
+      console.error(`Ошибка: ${err}`);
+    })
+    .finally(() => {
+      loading(false, submitButton, buttonText, loadingText);
+    });
+}
+
+const handleAvatarFormSubmit = (evt) => {
+     evt.preventDefault();
+    function makeRequest() {
+        const avatar = avatarUrlUnput.value;
+        return patchAvatar(avatar)
+        .then((res) => {
+            avatarImage.style.backgroundImage = `url(${user.avatar})`
+            closeModal(avatarForm);
+      });
+  }
+  handleSubmit(makeRequest, evt);
+}
+
 profileForm.addEventListener('submit', handleEditFormSubmit);
 addPlaceForm.addEventListener('submit', handleAddFormSubmit);
-
-Promise.all([getUserInfo(), getInitialCards()])
-  .then(([user, cards]) => {
-    addUserInfo(user);
-    renderInitialCards(cards, onDelete, putLike, openPopupImg, user._id);
-  })
-  .catch((err) => {
-    console.error("Произошла ошибка при получении данных:", err);
-  });
+avatarForm.addEventListener('submit', handleAvatarFormSubmit)
 
 // @todo: валидация попапов
 enableValidation(configValid);

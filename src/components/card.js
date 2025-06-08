@@ -24,10 +24,14 @@ export function createCard(cards, onDelete, openPopupImg, putLike, userId) {
         })
     };
 
-     const isLiked = cards.likes.some((like) => like._id === userId);
-        if (userId === cards._id) {
-            btnLike.classList.add("card_button-like_active")
-        }
+    const isLiked = cards.likes.some((like) => like._id === userId);
+    if (isLiked) {
+        btnLike.classList.add('card__like-button_is-active')
+    }
+
+    btnLike.addEventListener('click', () => {
+      putLike(likesCounter, btnLike, cards);
+    });
 
     return card;
 };
@@ -38,25 +42,24 @@ export function onDelete(card) {
 };
 
 // @todo: Функция лайка
-export function putLike(likesCounter, btnLike, cards) {
-  if (btnLike.classList.contains("card__like-button_is-active")) {
-    deleteCardLike(cards._id)
-    .then((res) => {
-      btnLike.classList.toggle("card__like-button_is-active");
-      likesCounter.textContent = res.likes.length;
-    })
-    .catch((err) => {
-      console.error("Ошибка:", err);
-    });
-  } else {
-    
-    putCardLike(cards._id)
-    .then((res) => {
-      btnLike.classList.toggle("card__like-button_is-active");
-      likesCounter.textContent = res.likes.length;
-    })
-    .catch((err) => {
-      console.error("Ошибка :", err);
-    });
-  }
-}
+export function putLike(counter, button, cards) {
+    if (button.classList.contains('card__like-button_is-active')) {
+        deleteCardLike(cards._id)
+        .then((res) => {
+        button.classList.toggle('card__like-button_is-active');
+        counter.textContent = res.likes.length;
+        })
+        .catch((err) => {
+          console.error("Ошибка:", err);
+        })
+    } else {
+      putCardLike(cards._id)
+      .then((res) => {
+        button.classList.toggle('card__like-button_is-active');
+        counter.textContent = res.likes.length;
+      })
+      .catch((err) => {
+        console.error('Ошибка :', err);
+      })
+    }
+};
