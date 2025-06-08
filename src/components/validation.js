@@ -54,6 +54,7 @@ const setEventListeners = (formElement, config) => {
     })
 };
 
+// Дублирование  evt.preventDefault() удалено в index.js, а здесь оставлено
  export const enableValidation = (config) => {
     const formList = Array.from(document.querySelectorAll(config.formSelector));
     formList.forEach((formElement) => {

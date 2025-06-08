@@ -49,13 +49,13 @@ export const getUserInfo = () => {
     .then(handleResponse)
 };
 
-export const patchUserInfo = (name, about) => {
+export const patchUserInfo = (data) => {
     return fetch(`${cfg.baseUrl}/users/me`, {
         method: 'PATCH',
         headers: cfg.headers,
         body: JSON.stringify({
-            name: name,
-            about: about
+            name: data.name,
+            about: data.about
         })
     })
     .then(handleResponse)

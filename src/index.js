@@ -1,5 +1,4 @@
 import './index.css';
-import {initialCards} from './components/cards';
 import {createCard, onDelete, putLike} from './components/card';
 import {openModal, closeModal, handleClose} from './components/modal';
 import {enableValidation, clearValidation} from './components/validation';
@@ -84,11 +83,13 @@ btnEditProfile.addEventListener('click', () => {
     clearValidation(profileForm, configValid);
 });
 btnAddCard.addEventListener('click', () => {
+    addPlaceForm.reset();
     openModal(popupAddCard);
     clearValidation(addPlaceForm, configValid);
 });
 
 avatarImage.addEventListener("click", () => {
+    avatarForm.reset();
     openModal(popupAvatar);
     clearValidation(avatarForm, configValid);
 });
@@ -117,43 +118,36 @@ function handleSubmit(request, evt, loadingText = "Сохранение...") {
     });
 }
 const handleEditFormSubmit = (evt) => {
-    evt.preventDefault();
-    profileTitle.textContent = nameInput.value;
-    profileDescription.textContent = jobInput.value;
-    closeModal(popupEditProfile);
-    handleSubmit(getUserInfo, evt);
+    handleSubmit(async () => {
+        const res = await patchUserInfo({
+            name: nameInput.value,
+            about: jobInput.value
+        });
+        profileTitle.textContent = res.name;
+        profileDescription.textContent = res.about;
+        closeModal(popupEditProfile);
+    }, evt);
 }
 const handleAddFormSubmit = (evt) => {
-    evt.preventDefault();
-    function makeRequest () {
-      return postCard(placeNameInput.value, linkInput.value)
-        .then ((card) => {
-          const newCard = createCard(card, onDelete, openPopupImg, putLike, userId);
-          cardList.prepend(newCard);
-          closeModal(popupAddCard);
-          addPlaceForm.reset();
-        });
-    }
-    handleSubmit(makeRequest, evt);
+    handleSubmit(async () => {
+        const card = await postCard(placeNameInput.value, linkInput.value);
+        const newCard = createCard(card, onDelete, openPopupImg, putLike, userId);
+        cardList.prepend(newCard);
+        closeModal(popupAddCard);
+    }, evt);
 };
 
 const handleAvatarFormSubmit = (evt) => {
-     evt.preventDefault();
-    function makeRequest() {
-        const avatar = avatarUrlUnput.value;
-        return patchAvatar(avatar)
-        .then((res) => {
-            avatarImage.style.backgroundImage = `url(${user.avatar})`
-            closeModal(popupAvatar);
-            avatarForm.reset();
-      });
-  }
-  handleSubmit(makeRequest, evt);
+   handleSubmit(async () => {
+        const res = await patchAvatar(avatarUrlUnput.value);
+        avatarImage.style.backgroundImage = `url(${res.avatar})`;
+        closeModal(popupAvatar);
+    }, evt);
 }
 
 profileForm.addEventListener('submit', handleEditFormSubmit);
 addPlaceForm.addEventListener('submit', handleAddFormSubmit);
-avatarForm.addEventListener('submit', handleAvatarFormSubmit)
+avatarForm.addEventListener('submit', handleAvatarFormSubmit);
 
 // @todo: валидация попапов
 enableValidation(configValid);

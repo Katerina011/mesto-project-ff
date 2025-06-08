@@ -37,9 +37,15 @@ export function createCard(cards, onDelete, openPopupImg, putLike, userId) {
 };
 
 // @todo: Функция удаления карточки
-export function onDelete(card) {
-    card.remove();
-};
+export function onDelete(card, cardId) {
+    deleteCard(cardId)
+        .then(() => {
+            card.remove();
+        })
+        .catch((err) => {
+            console.error(`Ошибка при удалении карточки: ${err}`);
+        });
+}
 
 // @todo: Функция лайка
 export function putLike(counter, button, cards) {
@@ -50,7 +56,7 @@ export function putLike(counter, button, cards) {
         counter.textContent = res.likes.length;
         })
         .catch((err) => {
-          console.error(`Ошибка: ${err}`);
+          console.error(`Ошибка при удалении лайка: ${err}`);
         })
     } else {
       putCardLike(cards._id)
@@ -59,7 +65,7 @@ export function putLike(counter, button, cards) {
         counter.textContent = res.likes.length;
       })
       .catch((err) => {
-        console.error(`Ошибка: ${err}`);
+        console.error(`Ошибка при постановке лайка: ${err}`);
       })
     }
 };
