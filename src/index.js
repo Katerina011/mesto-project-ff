@@ -118,31 +118,40 @@ function handleSubmit(request, evt, loadingText = "Сохранение...") {
     });
 }
 const handleEditFormSubmit = (evt) => {
-    handleSubmit(async () => {
-        const res = await patchUserInfo({
-            name: nameInput.value,
-            about: jobInput.value
-        });
-        profileTitle.textContent = res.name;
-        profileDescription.textContent = res.about;
-        closeModal(popupEditProfile);
-    }, evt);
-}
+   handleSubmit(async () => { 
+        const res = await patchUserInfo({ 
+            name: nameInput.value, 
+            about: jobInput.value 
+        }); 
+        profileTitle.textContent = res.name; 
+        profileDescription.textContent = res.about; 
+    }, evt); 
+    closeModal(popupEditProfile); 
+  }
+
 const handleAddFormSubmit = (evt) => {
-    handleSubmit(async () => {
-        const card = await postCard(placeNameInput.value, linkInput.value);
-        const newCard = createCard(card, onDelete, openPopupImg, putLike, userId);
-        cardList.prepend(newCard);
-        closeModal(popupAddCard);
-    }, evt);
+    postCard (placeNameInput.value, linkInput.value)
+    .then((card) => {
+      const newCard = createCard(card, onDelete, openPopupImg, putLike, userId);
+      cardList.prepend(newCard);
+      closeModal(popupAddCard);
+    })
+    .catch(err => {
+         console.error('Ошибка при добавлении карточки:', err);
+    })
+  handleSubmit(postCard, evt);
 };
 
 const handleAvatarFormSubmit = (evt) => {
-   handleSubmit(async () => {
-        const res = await patchAvatar(avatarUrlUnput.value);
+   patchAvatar(avatarUrlUnput.value)
+   .then((res) => {
         avatarImage.style.backgroundImage = `url(${res.avatar})`;
         closeModal(popupAvatar);
-    }, evt);
+   })
+   .catch(err => {
+         console.error('Ошибка при обновлении аватара:', err);
+    })
+  handleSubmit(patchAvatar, evt);
 }
 
 profileForm.addEventListener('submit', handleEditFormSubmit);
