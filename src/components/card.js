@@ -50,7 +50,7 @@ export function putLike(counter, button, cards) {
         counter.textContent = res.likes.length;
         })
         .catch((err) => {
-          console.error("Ошибка:", err);
+          console.error(`Ошибка: ${err}`);
         })
     } else {
       putCardLike(cards._id)
@@ -59,7 +59,7 @@ export function putLike(counter, button, cards) {
         counter.textContent = res.likes.length;
       })
       .catch((err) => {
-        console.error('Ошибка :', err);
+        console.error(`Ошибка: ${err}`);
       })
     }
 };

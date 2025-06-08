@@ -70,7 +70,7 @@ function addUserInfo(user) {
 Promise.all([getUserInfo(), getInitialCards()])
   .then(([user, cards]) => {
     addUserInfo(user);
-    renderInitialCards(cards, onDelete, putLike, openPopupImg, user._id);
+    renderInitialCards(cards, onDelete, openPopupImg, putLike, user._id);
   })
   .catch((err) => {
     console.error("Произошла ошибка при получении данных:", err);
@@ -99,23 +99,6 @@ handleClose(popupCardImg);
 handleClose(popupAvatar);
 
 // @todo: формы
-const handleEditFormSubmit = (evt) => {
-    evt.preventDefault();
-    profileTitle.textContent = nameInput.value;
-    profileDescription.textContent = jobInput.value;
-    closeModal(popupEditProfile);
-}
-const handleAddFormSubmit = (evt) => {
-    evt.preventDefault();
-    const newCard = {
-        name: placeNameInput.value,
-        link: linkInput.value,
-    };
-    cardList.prepend(createCard(newCard, onDelete, openPopupImg, putLike, userId));
-    closeModal(popupAddCard);
-    addPlaceForm.reset();
-};
-
 function handleSubmit(request, evt, loadingText = "Сохранение...") {
   evt.preventDefault();
     const submitButton = evt.submitter;
@@ -133,6 +116,26 @@ function handleSubmit(request, evt, loadingText = "Сохранение...") {
       loading(false, submitButton, buttonText, loadingText);
     });
 }
+const handleEditFormSubmit = (evt) => {
+    evt.preventDefault();
+    profileTitle.textContent = nameInput.value;
+    profileDescription.textContent = jobInput.value;
+    closeModal(popupEditProfile);
+    handleSubmit(getUserInfo, evt);
+}
+const handleAddFormSubmit = (evt) => {
+    evt.preventDefault();
+    function makeRequest () {
+      return postCard(placeNameInput.value, linkInput.value)
+        .then ((card) => {
+          const newCard = createCard(card, onDelete, openPopupImg, putLike, userId);
+          cardList.prepend(newCard);
+          closeModal(popupAddCard);
+          addPlaceForm.reset();
+        });
+    }
+    handleSubmit(makeRequest, evt);
+};
 
 const handleAvatarFormSubmit = (evt) => {
      evt.preventDefault();
@@ -141,7 +144,8 @@ const handleAvatarFormSubmit = (evt) => {
         return patchAvatar(avatar)
         .then((res) => {
             avatarImage.style.backgroundImage = `url(${user.avatar})`
-            closeModal(avatarForm);
+            closeModal(popupAvatar);
+            avatarForm.reset();
       });
   }
   handleSubmit(makeRequest, evt);
