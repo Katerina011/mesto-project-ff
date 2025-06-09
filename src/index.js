@@ -118,40 +118,32 @@ function handleSubmit(request, evt, loadingText = "Сохранение...") {
     });
 }
 const handleEditFormSubmit = (evt) => {
-   handleSubmit(async () => { 
-        const res = await patchUserInfo({ 
-            name: nameInput.value, 
-            about: jobInput.value 
-        }); 
-        profileTitle.textContent = res.name; 
-        profileDescription.textContent = res.about; 
-    }, evt); 
-    closeModal(popupEditProfile); 
-  }
+    handleSubmit(async () => {
+        const res = await patchUserInfo({
+            name: nameInput.value,
+            about: jobInput.value
+        });
+        profileTitle.textContent = res.name;
+        profileDescription.textContent = res.about;
+        closeModal(popupEditProfile);
+    }, evt);
+}
 
 const handleAddFormSubmit = (evt) => {
-    postCard (placeNameInput.value, linkInput.value)
-    .then((card) => {
-      const newCard = createCard(card, onDelete, openPopupImg, putLike, userId);
-      cardList.prepend(newCard);
-      closeModal(popupAddCard);
-    })
-    .catch(err => {
-         console.error('Ошибка при добавлении карточки:', err);
-    })
-  handleSubmit(postCard, evt);
+    handleSubmit(async () => {
+        const card = await postCard(placeNameInput.value, linkInput.value);
+        const newCard = createCard(card, onDelete, openPopupImg, putLike, userId);
+        cardList.prepend(newCard);
+        closeModal(popupAddCard);
+    }, evt);
 };
 
 const handleAvatarFormSubmit = (evt) => {
-   patchAvatar(avatarUrlUnput.value)
-   .then((res) => {
+    handleSubmit(async () => {
+        const res = await patchAvatar(avatarUrlUnput.value);
         avatarImage.style.backgroundImage = `url(${res.avatar})`;
         closeModal(popupAvatar);
-   })
-   .catch(err => {
-         console.error('Ошибка при обновлении аватара:', err);
-    })
-  handleSubmit(patchAvatar, evt);
+    }, evt);
 }
 
 profileForm.addEventListener('submit', handleEditFormSubmit);
